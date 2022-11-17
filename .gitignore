@@ -3,6 +3,6 @@
 .idea
 # Ignore Gradle build output directory
 build
-
+.rock-paper-scissors*
 # Ignore vim swap files
 *.swp
