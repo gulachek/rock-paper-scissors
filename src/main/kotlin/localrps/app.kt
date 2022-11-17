@@ -9,6 +9,7 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import localrps.util.qrPng
 import java.io.File
+import java.net.InetAddress
 
 class Address(val port: Int, val host: String){
 	fun toUrl(): String {
@@ -67,7 +68,7 @@ fun parseArgs(args: Array<String>): CommandLineArgs {
 	}
 
 	return CommandLineArgs(
-		addr=Address(port=port, host="0.0.0.0"),
+		addr=Address(port=port, host=InetAddress.getLocalHost().getHostName()),
 		dir=dir
 	)
 }
