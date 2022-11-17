@@ -1,3 +1,5 @@
+# no node dependencies
+node_modules
 # Ignore Gradle project-specific cache directory
 .gradle
 .idea

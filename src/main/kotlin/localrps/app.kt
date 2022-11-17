@@ -24,7 +24,7 @@ fun main(args: Array<String>) {
 	val dir = config.dir
 
 	System.out.println("Using directory $dir")
-	System.out.println("Running on ${addr.toUrl()}")
+	System.out.println("Connect board to ${addr.toUrl()}/static/board.html")
 
 	embeddedServer(Netty, port = addr.port, host = addr.host) {
 		configureRouting(config)
@@ -37,13 +37,9 @@ fun Application.configureRouting(config: CommandLineArgs) {
 			resources("files")
 		}
 
-		get("/"){
-			call.respondRedirect("/static/index.html")
-		}
-
 		get("/qr"){
 			val qrFilename = "${config.dir}/hostname-qr.png"
-			qrPng(qrFilename, "png", config.addr.toUrl())
+			qrPng(qrFilename, "png", "${config.addr.toUrl()}/static/controller.html")
 			val qrFile = File(qrFilename)
 			call.response.header(
 				HttpHeaders.ContentDisposition,
