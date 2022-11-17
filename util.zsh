@@ -5,5 +5,5 @@ function b {
 }
 
 function r {
-	./gradlew run
+	./gradlew run --args="$*[*]"
 }

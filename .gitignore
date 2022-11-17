@@ -5,4 +5,4 @@
 build
 
 # Ignore vim swap files
-.swp
+*.swp
