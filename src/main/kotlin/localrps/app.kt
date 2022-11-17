@@ -32,8 +32,12 @@ fun main(args: Array<String>) {
 
 fun Application.configureRouting(config: CommandLineArgs) {
 	routing {
+		static("/static"){
+			resources("files")
+		}
+
 		get("/"){
-			call.respondText("Hello World!")
+			call.respondRedirect("/static/index.html")
 		}
 
 		get("/qr"){
