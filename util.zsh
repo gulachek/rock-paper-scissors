@@ -1,6 +1,7 @@
 #!/bin/zsh
 
 function b {
+	npx webpack --mode development
 	./gradlew build
 }
 

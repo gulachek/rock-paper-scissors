@@ -7,9 +7,13 @@ import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import io.ktor.websocket.*
+import io.ktor.server.websocket.*
 import localrps.util.qrPng
 import java.io.File
 import java.net.InetAddress
+import java.util.concurrent.atomic.*
+import java.util.*
 
 class Address(val port: Int, val host: String){
 	fun toUrl(): String {
@@ -27,14 +31,52 @@ fun main(args: Array<String>) {
 	System.out.println("Connect board to ${addr.toUrl()}/static/board.html")
 
 	embeddedServer(Netty, port = addr.port, host = addr.host) {
+		install(WebSockets)
 		configureRouting(config)
 	}.start(wait = true)
 }
 
+class Connection(val session: DefaultWebSocketSession) {
+	companion object {
+		val lastId = AtomicInteger(0)
+	}
+	val name = "users${lastId.getAndIncrement()}"
+}
+
 fun Application.configureRouting(config: CommandLineArgs) {
 	routing {
+		val connections = Collections.synchronizedSet<Connection?>(LinkedHashSet())
+		var n = 1
+
+		suspend fun update() {
+			connections.forEach {
+				it.session.send(n.toString())
+			}
+		}
+
 		static("/static"){
 			resources("files")
+		}
+
+		get("/increment") {
+			n += 1
+			update()
+			call.respondText("")
+		}
+
+		webSocket("/updates") {
+			val thisConnection = Connection(this)
+			connections += thisConnection
+
+			try {
+				update()
+				for (frame in incoming) {
+				}
+			} catch (e: Exception) {
+				println(e.localizedMessage)
+			}finally {
+				connections -= thisConnection
+			}
 		}
 
 		get("/qr"){

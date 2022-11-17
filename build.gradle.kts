@@ -16,6 +16,7 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("io.ktor:ktor-server-core-jvm:$ktor_version")
     implementation("io.ktor:ktor-server-netty-jvm:$ktor_version")
+    implementation("io.ktor:ktor-server-websockets:$ktor_version")
     implementation("ch.qos.logback:logback-classic:$logback_version")
     implementation("com.google.zxing:core:3.3.0")
     implementation("com.google.zxing:javase:3.3.0")
