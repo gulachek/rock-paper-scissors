@@ -9,6 +9,8 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.websocket.*
 import io.ktor.server.websocket.*
+import localrps.routing.gameUpdateRouting
+import localrps.routing.qrRouting
 import localrps.util.qrPng
 import java.io.File
 import java.net.InetAddress
@@ -44,53 +46,8 @@ class Connection(val session: DefaultWebSocketSession) {
 }
 
 fun Application.configureRouting(config: CommandLineArgs) {
-	routing {
-		val connections = Collections.synchronizedSet<Connection?>(LinkedHashSet())
-		var n = 1
-
-		suspend fun update() {
-			connections.forEach {
-				it.session.send(n.toString())
-			}
-		}
-
-		static("/static"){
-			resources("files")
-		}
-
-		get("/increment") {
-			n += 1
-			update()
-			call.respondText("")
-		}
-
-		webSocket("/updates") {
-			val thisConnection = Connection(this)
-			connections += thisConnection
-
-			try {
-				update()
-				for (frame in incoming) {
-				}
-			} catch (e: Exception) {
-				println(e.localizedMessage)
-			}finally {
-				connections -= thisConnection
-			}
-		}
-
-		get("/qr"){
-			val qrFilename = "${config.dir}/hostname-qr.png"
-			qrPng(qrFilename, "png", "${config.addr.toUrl()}/static/controller.html")
-			val qrFile = File(qrFilename)
-			call.response.header(
-				HttpHeaders.ContentDisposition,
-				ContentDisposition.Attachment.withParameter(ContentDisposition.Parameters.FileName, qrFilename)
-					.toString()
-			)
-			call.respondFile(qrFile)
-		}
-	}
+	qrRouting(config)
+	gameUpdateRouting(config)
 }
 
 fun parseArgs(args: Array<String>): CommandLineArgs {
